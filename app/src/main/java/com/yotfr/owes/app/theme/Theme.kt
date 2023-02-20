@@ -5,6 +5,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.yotfr.owes.app.utils.LocalSpacing
+import com.yotfr.owes.app.utils.Spacing
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -34,6 +37,8 @@ fun OwesTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable (
     } else {
         LightColorPalette
     }
+
+    CompositionLocalProvider(LocalSpacing provides Spacing()) {}
 
     MaterialTheme(
         colors = colors,

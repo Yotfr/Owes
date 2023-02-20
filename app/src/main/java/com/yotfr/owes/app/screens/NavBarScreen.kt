@@ -7,9 +7,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,53 +22,28 @@ import com.yotfr.owes.app.navigation.DEBT_ID_ARGUMENT_KEY
 import com.yotfr.owes.app.navigation.NavBarScreenRoutes
 import com.yotfr.owes.app.navigation.TopLevelScreenRoutes
 import com.yotfr.owes.app.navigation.WITHOUT_DEBT_ID
-import com.yotfr.owes.app.screens.debtdetails.DebtDetailsSceen
+import com.yotfr.owes.app.screens.debtdetails.DebtDetailsScreen
 import com.yotfr.owes.app.screens.givendebts.GivenDebtsScreen
 import com.yotfr.owes.app.screens.takendebts.TakenDebtsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavBarScreen() {
-    val navController = rememberNavController()
-    val navItems = listOf(
-        NavBarScreenRoutes.TakenDebts,
-        NavBarScreenRoutes.GivenDebts,
-        NavBarScreenRoutes.People
-    )
+fun NavBarScreen(
+    navController: NavHostController = rememberNavController()
+) {
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                navItems.forEach { navBarScreenRoutes ->
-                    NavigationBarItem(
-                        label = { Text(text = stringResource(id = navBarScreenRoutes.label)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == navBarScreenRoutes.route } == true,
-                        onClick = {
-                            navController.navigate(navBarScreenRoutes.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {}
-                    )
-                }
-            }
+            BottomNavBar(navController = navController)
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate(
-                    TopLevelScreenRoutes.DebtDetailsScreen.passDebtId()
-                )
-            }) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = "Add debt"
-                )
-            }
+            FAB(
+                onClick = {
+                    navController.navigate(
+                        TopLevelScreenRoutes.DebtDetailsScreen.passDebtId()
+                    )
+                },
+                navController = navController
+            )
         }
     ) { innerPadding ->
         NavHost(
@@ -91,7 +68,77 @@ fun NavBarScreen() {
                     }
                 )
             ) {
-                DebtDetailsSceen(navController = navController)
+                DebtDetailsScreen(navController = navController)
+            }
+        }
+    }
+}
+
+@Composable
+fun FAB(
+    onClick: () -> Unit,
+    navController: NavHostController
+) {
+    val navItems = listOf(
+        NavBarScreenRoutes.TakenDebts,
+        NavBarScreenRoutes.GivenDebts,
+        NavBarScreenRoutes.People
+    )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val bottomBarDestination = navItems.any { it.route == currentDestination?.route }
+
+    if (bottomBarDestination) {
+        FloatingActionButton(
+            onClick = {
+                onClick()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = "Add debt"
+            )
+        }
+    }
+}
+
+@Composable
+fun BottomNavBar(navController: NavHostController) {
+    val navItems = listOf(
+        NavBarScreenRoutes.TakenDebts,
+        NavBarScreenRoutes.GivenDebts,
+        NavBarScreenRoutes.People
+    )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val bottomBarDestination = navItems.any { it.route == currentDestination?.route }
+
+    if (bottomBarDestination) {
+        NavigationBar {
+            navItems.forEach { navBarScreenRoutes ->
+                NavigationBarItem(
+                    label = { Text(text = stringResource(id = navBarScreenRoutes.label)) },
+                    selected = currentDestination?.hierarchy?.any { it.route == navBarScreenRoutes.route } == true,
+                    onClick = {
+                        navController.navigate(navBarScreenRoutes.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(navBarScreenRoutes.icon),
+                            contentDescription = "Icon"
+                        )
+                    }
+                )
             }
         }
     }

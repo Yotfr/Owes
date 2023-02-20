@@ -4,25 +4,31 @@ package com.yotfr.owes.app.screens.debtdetails
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import com.yotfr.owes.R
+import com.yotfr.owes.app.utils.spacing
 import com.yotfr.owes.domain.model.DebtStatus
 import java.time.LocalDate
 
 @Composable
-fun DebtDetailsSceen(
+fun DebtDetailsScreen(
     navController: NavController,
     viewModel: DebtDetailsViewModel = hiltViewModel()
 ) {
@@ -52,7 +58,7 @@ fun DebtDetailsSceen(
         ) {
             AmountTextField(
                 modifier = Modifier.fillMaxWidth(),
-                amountText = state.debtAmount.toString(),
+                amountText = state.debtAmount ?: "",
                 onAmountTextChanged = { newAmount ->
                     viewModel.onEvent(
                         DebtDetailsEvent.DebtAmountChanged(
@@ -61,6 +67,7 @@ fun DebtDetailsSceen(
                     )
                 }
             )
+            Divider()
             DebtStatus(
                 modifier = Modifier.fillMaxWidth(),
                 currentDebtStatus = state.debtStatus,
@@ -72,6 +79,7 @@ fun DebtDetailsSceen(
                     )
                 }
             )
+            Divider()
             PersonTextField(
                 modifier = Modifier.fillMaxWidth(),
                 personNameText = state.personName,
@@ -91,6 +99,7 @@ fun DebtDetailsSceen(
                     )
                 }
             )
+            Divider()
             DebtDateFields(
                 modifier = Modifier.fillMaxWidth(),
                 takingDate = state.takingDateString,
@@ -102,6 +111,7 @@ fun DebtDetailsSceen(
                     repaymentDateDialogState.show()
                 }
             )
+            Divider()
             CommentaryTextField(
                 modifier = Modifier.fillMaxWidth(),
                 commentaryText = state.debtCommentary,
@@ -200,23 +210,35 @@ fun DebtDateFields(
     onRepaymentDateClicked: () -> Unit
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .padding(
+                horizontal = MaterialTheme.spacing.medium,
+                vertical = MaterialTheme.spacing.small
+            ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = takingDate,
-            modifier = modifier
-                .clickable {
-                    onTakingDateClicked()
-                }
-        )
-        Text(
-            text = repaymentDate,
-            modifier = modifier
-                .clickable {
-                    onRepaymentDateClicked()
-                }
-        )
+        TextButton(
+            onClick = {
+                onTakingDateClicked()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.DateRange,
+                contentDescription = "Date"
+            )
+            Text(text = takingDate)
+        }
+        TextButton(
+            onClick = {
+                onRepaymentDateClicked()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.DateRange,
+                contentDescription = "Date"
+            )
+            Text(text = repaymentDate)
+        }
     }
 }
 
@@ -229,12 +251,24 @@ fun DebtStatus(
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        Text(
-            text = currentDebtStatus.name,
-            modifier = Modifier
-                .fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth()
                 .clickable { expanded = true }
-        )
+                .padding(
+                    horizontal = MaterialTheme.spacing.medium,
+                    vertical = MaterialTheme.spacing.medium
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = currentDebtStatus.name,
+                modifier = Modifier
+            )
+            Icon(
+                imageVector = Icons.Outlined.ArrowDropDown,
+                contentDescription = "Debt status"
+            )
+        }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
@@ -262,7 +296,22 @@ fun AmountTextField(
         onValueChange = {
             onAmountTextChanged(it)
         },
-        modifier = modifier
+        modifier = modifier,
+        trailingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_currency_rubble),
+                contentDescription = "Currency"
+            )
+        },
+        placeholder = {
+            Text(text = "0")
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            backgroundColor = Color.Transparent
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
 }
 
@@ -276,16 +325,47 @@ fun PersonTextField(
 ) {
     Column(modifier = modifier) {
         TextField(
+            modifier = Modifier.fillMaxWidth(),
             value = personNameText,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = "Person"
+                )
+            },
+            placeholder = {
+                Text(text = "Person name")
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                backgroundColor = Color.Transparent
+            ),
             onValueChange = {
                 onPersonNameChanged(it)
             }
         )
         TextField(
+            modifier = Modifier.fillMaxWidth(),
             value = personPhoneNumber,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Phone,
+                    contentDescription = "Phone"
+                )
+            },
+            placeholder = {
+                Text(text = "Person phone number (optional)")
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                backgroundColor = Color.Transparent
+            ),
             onValueChange = {
                 onPersonPhoneNumberChanged(it)
-            }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
         )
     }
 }
@@ -301,6 +381,14 @@ fun CommentaryTextField(
         onValueChange = {
             onCommentaryChanged(it)
         },
-        modifier = modifier
+        modifier = modifier,
+        placeholder = {
+            Text(text = "Commentary")
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            backgroundColor = Color.Transparent
+        )
     )
 }

@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.yotfr.owes.app.navigation.TopLevelScreenRoutes
 import com.yotfr.owes.app.screens.DebtItem
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TakenDebtsScreen(
@@ -30,7 +31,10 @@ fun TakenDebtsScreen(
                         )
                     )
                 },
-                onPersonClicked = { }
+                onPersonClicked = { },
+                repaymentDate = item.debt.repaymentDate?.format(
+                    DateTimeFormatter.ISO_DATE
+                ) ?: "Without time limit"
             )
         }
     }

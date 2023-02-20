@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yotfr.owes.app.navigation.DEBT_ID_ARGUMENT_KEY
+import com.yotfr.owes.app.navigation.WITHOUT_DEBT_ID
 import com.yotfr.owes.domain.model.DebtWithPerson
 import com.yotfr.owes.domain.usecase.AddNewDebtUseCase
 import com.yotfr.owes.domain.usecase.FindDebtByIdUseCase
@@ -23,15 +24,15 @@ class DebtDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _debtId: Long? = savedStateHandle[DEBT_ID_ARGUMENT_KEY]
+    private val _debtId: Long = checkNotNull(savedStateHandle[DEBT_ID_ARGUMENT_KEY])
 
     private val _state = MutableStateFlow(DebtDetailsState())
     val state = _state.asStateFlow()
 
     init {
-        _debtId?.let {
+        if (_debtId != WITHOUT_DEBT_ID) {
             viewModelScope.launch {
-                findDebtByIdUseCase(it).collectLatest { debtWithPerson ->
+                findDebtByIdUseCase(_debtId).collectLatest { debtWithPerson ->
                     processDebtWithPersonData(debtWithPerson)
                 }
             }
@@ -46,7 +47,6 @@ class DebtDetailsViewModel @Inject constructor(
                         debtAmount = event.newAmount
                     )
                 }
-                // TODO: validate amount
             }
             is DebtDetailsEvent.DebtCommentaryChanged -> {
                 _state.update {
@@ -125,7 +125,13 @@ class DebtDetailsViewModel @Inject constructor(
                     debtCommentary = debtWithPerson.debt.commentaryMessage ?: "",
                     debtStatus = debtWithPerson.debt.debtStatus,
                     takingDate = debtWithPerson.debt.takingDate,
+                    takingDateString = debtWithPerson.debt.takingDate?.format(
+                        DateTimeFormatter.ISO_DATE
+                    ) ?: "taking date",
                     repaymentDate = debtWithPerson.debt.repaymentDate,
+                    repaymentDateString = debtWithPerson.debt.repaymentDate?.format(
+                        DateTimeFormatter.ISO_DATE
+                    ) ?: "repayment date",
                     personName = debtWithPerson.person.name,
                     personPhoneNumber = debtWithPerson.person.phoneNumber ?: ""
                 )
