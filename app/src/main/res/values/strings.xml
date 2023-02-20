@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Owes</string>
+
+    <string name="taken_debts_label">Taken</string>
+    <string name="given_debts_label">Given</string>
+    <string name="people_label">People</string>
+
+</resources>
