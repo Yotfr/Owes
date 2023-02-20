@@ -24,6 +24,7 @@ import com.yotfr.owes.app.navigation.TopLevelScreenRoutes
 import com.yotfr.owes.app.navigation.WITHOUT_DEBT_ID
 import com.yotfr.owes.app.screens.debtdetails.DebtDetailsScreen
 import com.yotfr.owes.app.screens.givendebts.GivenDebtsScreen
+import com.yotfr.owes.app.screens.people.PeopleScreen
 import com.yotfr.owes.app.screens.takendebts.TakenDebtsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +59,7 @@ fun NavBarScreen(
                 TakenDebtsScreen(navController = navController)
             }
             composable(NavBarScreenRoutes.People.route) {
+                PeopleScreen(navController = navController)
             }
             composable(
                 route = TopLevelScreenRoutes.DebtDetailsScreen.route,

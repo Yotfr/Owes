@@ -3,8 +3,12 @@ package com.yotfr.owes.data.repository
 import com.yotfr.owes.data.datasource.local.PersonDao
 import com.yotfr.owes.data.util.mapToPerson
 import com.yotfr.owes.data.util.mapToPersonEntity
+import com.yotfr.owes.data.util.mapToPersonWithDebts
 import com.yotfr.owes.domain.model.Person
+import com.yotfr.owes.domain.model.PersonWithDebts
 import com.yotfr.owes.domain.repository.PersonRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PersonRepositoryImpl @Inject constructor(
@@ -26,5 +30,11 @@ class PersonRepositoryImpl @Inject constructor(
         return personDao.findPersonByName(
             name = name
         )?.mapToPerson()
+    }
+
+    override fun getAllPersonsWithDebts(): Flow<List<PersonWithDebts>> {
+        return personDao.getAllPerson().map {
+            it.map { it.mapToPersonWithDebts() }
+        }
     }
 }

@@ -2,10 +2,7 @@ package com.yotfr.owes.app.di
 
 import com.yotfr.owes.domain.repository.DebtRepository
 import com.yotfr.owes.domain.repository.PersonRepository
-import com.yotfr.owes.domain.usecase.AddNewDebtUseCase
-import com.yotfr.owes.domain.usecase.FindDebtByIdUseCase
-import com.yotfr.owes.domain.usecase.GetAllGivenDebtsUseCase
-import com.yotfr.owes.domain.usecase.GetAllTakenDebtsUseCase
+import com.yotfr.owes.domain.usecase.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,6 +47,15 @@ class UseCasesModule {
     ): FindDebtByIdUseCase {
         return FindDebtByIdUseCase(
             debtRepository = debtRepository
+        )
+    }
+
+    @Provides
+    fun provideGetAllPersonsWithDebtsUseCase(
+        personRepository: PersonRepository
+    ): GetAllPersonsWithDebts {
+        return GetAllPersonsWithDebts(
+            personRepository = personRepository
         )
     }
 }
