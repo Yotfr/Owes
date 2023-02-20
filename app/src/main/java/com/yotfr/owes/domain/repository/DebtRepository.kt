@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface DebtRepository {
     suspend fun createDebt(debt: Debt)
     suspend fun deleteDebt(debt: Debt)
+    fun findDebtById(debtId: Long): Flow<DebtWithPerson?>
     fun getAllGivenDebts(): Flow<List<DebtWithPerson>>
     fun getAllTakenDebts(): Flow<List<DebtWithPerson>>
 }

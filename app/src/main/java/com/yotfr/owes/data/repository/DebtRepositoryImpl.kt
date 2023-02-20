@@ -26,6 +26,12 @@ class DebtRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun findDebtById(debtId: Long): Flow<DebtWithPerson?> {
+        return debtDao.findDebtById(
+            debtId = debtId
+        ).map { it?.mapToDebtWithPerson() }
+    }
+
     override fun getAllGivenDebts(): Flow<List<DebtWithPerson>> {
         return debtDao.getAllGivenDebts().map {
             it.map { it.mapToDebtWithPerson() }

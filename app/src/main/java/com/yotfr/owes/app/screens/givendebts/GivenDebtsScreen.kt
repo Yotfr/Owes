@@ -1,12 +1,12 @@
 package com.yotfr.owes.app.screens.givendebts
 
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.yotfr.owes.app.navigation.TopLevelScreenRoutes
 import com.yotfr.owes.app.screens.DebtItem
 
 @Composable
@@ -21,7 +21,15 @@ fun GivenDebtsScreen(
                 debtAmount = item.debt.amount.toString(),
                 debtCommentary = item.debt.commentaryMessage ?: "",
                 personName = item.person.name,
-                onItemClicked = { },
+                onItemClicked = {
+                    navController.navigate(
+                        TopLevelScreenRoutes.DebtDetailsScreen.passDebtId(
+                            debtId = item.debt.id ?: throw IllegalArgumentException(
+                                "If item exists itemId cannot be null"
+                            )
+                        )
+                    )
+                },
                 onPersonClicked = { }
             )
         }

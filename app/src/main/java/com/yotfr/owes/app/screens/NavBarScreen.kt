@@ -10,11 +10,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.yotfr.owes.app.navigation.DEBT_ID_ARGUMENT_KEY
 import com.yotfr.owes.app.navigation.NavBarScreenRoutes
+import com.yotfr.owes.app.navigation.TopLevelScreenRoutes
+import com.yotfr.owes.app.navigation.WITHOUT_DEBT_ID
 import com.yotfr.owes.app.screens.debtdetails.DebtDetailsSceen
 import com.yotfr.owes.app.screens.givendebts.GivenDebtsScreen
 import com.yotfr.owes.app.screens.takendebts.TakenDebtsScreen
@@ -53,7 +58,9 @@ fun NavBarScreen() {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                navController.navigate("debtDetails")
+                navController.navigate(
+                    TopLevelScreenRoutes.DebtDetailsScreen.passDebtId()
+                )
             }) {
                 Icon(
                     imageVector = Icons.Outlined.Add,
@@ -74,9 +81,16 @@ fun NavBarScreen() {
                 TakenDebtsScreen(navController = navController)
             }
             composable(NavBarScreenRoutes.People.route) {
-
             }
-            composable("debtDetails") {
+            composable(
+                route = TopLevelScreenRoutes.DebtDetailsScreen.route,
+                arguments = listOf(
+                    navArgument(DEBT_ID_ARGUMENT_KEY) {
+                        type = NavType.LongType
+                        defaultValue = WITHOUT_DEBT_ID
+                    }
+                )
+            ) {
                 DebtDetailsSceen(navController = navController)
             }
         }

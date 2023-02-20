@@ -18,6 +18,10 @@ interface DebtDao {
     suspend fun deleteDebt(debt: DebtEntity)
 
     @Transaction
+    @Query("SELECT * FROM debt WHERE id = :debtId")
+    fun findDebtById(debtId: Long): Flow<DebtWithPersonRelation?>
+
+    @Transaction
     @Query("SELECT * FROM debt WHERE isDebtTaken = 0")
     fun getAllGivenDebts(): Flow<List<DebtWithPersonRelation>>
 

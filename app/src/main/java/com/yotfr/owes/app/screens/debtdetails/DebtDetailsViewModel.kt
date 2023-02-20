@@ -1,11 +1,16 @@
 package com.yotfr.owes.app.screens.debtdetails
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yotfr.owes.app.navigation.DEBT_ID_ARGUMENT_KEY
+import com.yotfr.owes.domain.model.DebtWithPerson
 import com.yotfr.owes.domain.usecase.AddNewDebtUseCase
+import com.yotfr.owes.domain.usecase.FindDebtByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -13,13 +18,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DebtDetailsViewModel @Inject constructor(
-    private val addNewDebtUseCase: AddNewDebtUseCase
+    private val addNewDebtUseCase: AddNewDebtUseCase,
+    private val findDebtByIdUseCase: FindDebtByIdUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val _debtId: Long? = savedStateHandle[DEBT_ID_ARGUMENT_KEY]
 
     private val _state = MutableStateFlow(DebtDetailsState())
     val state = _state.asStateFlow()
 
-    private val _debtId = MutableStateFlow<Long?>(null)
+    init {
+        _debtId?.let {
+            viewModelScope.launch {
+                findDebtByIdUseCase(it).collectLatest { debtWithPerson ->
+                    processDebtWithPersonData(debtWithPerson)
+                }
+            }
+        }
+    }
 
     fun onEvent(event: DebtDetailsEvent) {
         when (event) {
@@ -83,9 +100,9 @@ class DebtDetailsViewModel @Inject constructor(
             }
             DebtDetailsEvent.SaveClicked -> {
                 viewModelScope.launch {
-                    if (_state.value.debtAmount != null && _state.value.personName.isNotBlank() ) {
+                    if (_state.value.debtAmount != null && _state.value.personName.isNotBlank()) {
                         addNewDebtUseCase(
-                            debtId = _debtId.value,
+                            debtId = _debtId,
                             debtAmount = _state.value.debtAmount!!.toLong(),
                             debtStatus = _state.value.debtStatus,
                             takingDate = _state.value.takingDate,
@@ -97,6 +114,26 @@ class DebtDetailsViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun processDebtWithPersonData(debtWithPerson: DebtWithPerson?) {
+        debtWithPerson?.let {
+            _state.update {
+                it.copy(
+                    debtAmount = debtWithPerson.debt.amount.toString(),
+                    debtCommentary = debtWithPerson.debt.commentaryMessage ?: "",
+                    debtStatus = debtWithPerson.debt.debtStatus,
+                    takingDate = debtWithPerson.debt.takingDate,
+                    repaymentDate = debtWithPerson.debt.repaymentDate,
+                    personName = debtWithPerson.person.name,
+                    personPhoneNumber = debtWithPerson.person.phoneNumber ?: ""
+                )
+            }
+        } ?: kotlin.run {
+            throw IllegalArgumentException(
+                "DebtWithPerson cannot be null if debtId not null"
+            )
         }
     }
 }
