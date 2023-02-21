@@ -42,6 +42,15 @@ class UseCasesModule {
     }
 
     @Provides
+    fun provideFindPersonByIdUseCase(
+        personRepository: PersonRepository
+    ): FindPersonByIdUseCase {
+        return FindPersonByIdUseCase(
+            personRepository = personRepository
+        )
+    }
+
+    @Provides
     fun provideFindDebtByIdUseCase(
         debtRepository: DebtRepository
     ): FindDebtByIdUseCase {

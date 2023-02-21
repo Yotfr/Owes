@@ -2,6 +2,7 @@ package com.yotfr.owes.app.screens.people
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yotfr.owes.app.screens.UiPerson
 import com.yotfr.owes.domain.usecase.GetAllPersonsWithDebts
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

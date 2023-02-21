@@ -16,6 +16,10 @@ interface PersonDao {
     suspend fun findPersonByName(name: String): PersonEntity?
 
     @Transaction
+    @Query("SELECT * FROM person WHERE id = :personId")
+    fun findPersonById(personId: Long): Flow<PersonWithDebtsRelation?>
+
+    @Transaction
     @Query("SELECT * FROM person")
     fun getAllPerson(): Flow<List<PersonWithDebtsRelation>>
 }

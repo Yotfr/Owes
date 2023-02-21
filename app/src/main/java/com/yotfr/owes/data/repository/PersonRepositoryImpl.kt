@@ -32,6 +32,12 @@ class PersonRepositoryImpl @Inject constructor(
         )?.mapToPerson()
     }
 
+    override fun findPersonById(personId: Long): Flow<PersonWithDebts?> {
+        return personDao.findPersonById(
+            personId = personId
+        ).map { it?.mapToPersonWithDebts() }
+    }
+
     override fun getAllPersonsWithDebts(): Flow<List<PersonWithDebts>> {
         return personDao.getAllPerson().map {
             it.map { it.mapToPersonWithDebts() }

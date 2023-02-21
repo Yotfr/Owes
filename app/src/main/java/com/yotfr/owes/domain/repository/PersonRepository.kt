@@ -8,5 +8,6 @@ interface PersonRepository {
     suspend fun createPerson(person: Person): Long
     suspend fun deletePerson(person: Person)
     suspend fun findPersonByName(name: String): Person?
+    fun findPersonById(personId: Long): Flow<PersonWithDebts?>
     fun getAllPersonsWithDebts(): Flow<List<PersonWithDebts>>
 }

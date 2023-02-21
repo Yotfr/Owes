@@ -18,13 +18,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.yotfr.owes.app.navigation.DEBT_ID_ARGUMENT_KEY
-import com.yotfr.owes.app.navigation.NavBarScreenRoutes
-import com.yotfr.owes.app.navigation.TopLevelScreenRoutes
-import com.yotfr.owes.app.navigation.WITHOUT_DEBT_ID
+import com.yotfr.owes.app.navigation.*
 import com.yotfr.owes.app.screens.debtdetails.DebtDetailsScreen
 import com.yotfr.owes.app.screens.givendebts.GivenDebtsScreen
 import com.yotfr.owes.app.screens.people.PeopleScreen
+import com.yotfr.owes.app.screens.persondetails.PersonDetailsScreen
 import com.yotfr.owes.app.screens.takendebts.TakenDebtsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +38,7 @@ fun NavBarScreen(
             FAB(
                 onClick = {
                     navController.navigate(
-                        TopLevelScreenRoutes.DebtDetailsScreen.passDebtId()
+                        GlobalScreenRoutes.DebtDetailsScreen.passDebtId()
                     )
                 },
                 navController = navController
@@ -62,7 +60,17 @@ fun NavBarScreen(
                 PeopleScreen(navController = navController)
             }
             composable(
-                route = TopLevelScreenRoutes.DebtDetailsScreen.route,
+                route = GlobalScreenRoutes.PersonDetailScreen.route,
+                arguments = listOf(
+                    navArgument(PERSON_ID_ARGUMENT_KEY) {
+                        type = NavType.LongType
+                    }
+                )
+            ) {
+                PersonDetailsScreen(navController = navController)
+            }
+            composable(
+                route = GlobalScreenRoutes.DebtDetailsScreen.route,
                 arguments = listOf(
                     navArgument(DEBT_ID_ARGUMENT_KEY) {
                         type = NavType.LongType

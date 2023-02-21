@@ -102,7 +102,7 @@ class DebtDetailsViewModel @Inject constructor(
                 viewModelScope.launch {
                     if (_state.value.debtAmount != null && _state.value.personName.isNotBlank()) {
                         addNewDebtUseCase(
-                            debtId = _debtId,
+                            debtId = if(_debtId == WITHOUT_DEBT_ID) null else _debtId,
                             debtAmount = _state.value.debtAmount!!.toLong(),
                             debtStatus = _state.value.debtStatus,
                             takingDate = _state.value.takingDate,
